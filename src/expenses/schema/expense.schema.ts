@@ -10,6 +10,9 @@ export class Expenses {
 
   @Prop({ type: Date })
   createdAt: Date;
+
+  //   @Prop({ type: Date })
+  //   createdAt: Date;
 }
 
 export const expensesSchema = SchemaFactory.createForClass(Expenses);
