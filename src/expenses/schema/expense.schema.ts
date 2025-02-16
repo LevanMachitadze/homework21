@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
 
 @Schema()
 export class Expenses {
@@ -6,13 +7,10 @@ export class Expenses {
   describtion: string;
 
   @Prop({ type: Number })
-  price: number;
+  amount: number;
 
-  @Prop({ type: Date })
-  createdAt: Date;
-
-  //   @Prop({ type: Date })
-  //   createdAt: Date;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'user' })
+  user: mongoose.Schema.Types.ObjectId;
 }
 
 export const expensesSchema = SchemaFactory.createForClass(Expenses);
