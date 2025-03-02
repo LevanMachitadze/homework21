@@ -26,7 +26,7 @@ export class PostsController {
     @Req() request,
     @Body() createPostDto: CreatePostDto,
   ) {
-    console.log(subscription);
+    // console.log(subscription);
 
     const userId = request.userId;
 

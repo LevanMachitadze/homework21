@@ -7,11 +7,16 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
+import { IsAuthGuard } from 'src/auth/auth .guard';
+import { Role } from './role.decorator';
+import { RoleGuard } from 'src/guards/role.guard';
 
 @Controller('users')
 export class UsersController {
@@ -24,7 +29,7 @@ export class UsersController {
 
   @Get()
   findAll(@Query() queryParams: QueryParamsDto) {
-    console.log(queryParams);
+    // console.log(queryParams);
 
     return this.usersService.findAll(queryParams);
   }
@@ -39,10 +44,16 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(id, updateUserDto);
-  // }
+  @Patch(':id')
+  @UseGuards(IsAuthGuard, RoleGuard)
+  update(
+    @Role() Role,
+    @Req() req,
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.usersService.update(Role, req.userId, id, updateUserDto);
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

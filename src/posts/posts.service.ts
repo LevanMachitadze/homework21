@@ -32,7 +32,6 @@ export class PostsService {
     if (subscription === 'premium' && postCount >= 300)
       throw new BadRequestException('upgrade subscription plan');
     console.log(subscription, 'subscribtion');
-    console.log(userId, 'user id');
 
     const newPost = await this.postModel.create({
       ...createPostDto,

@@ -20,25 +20,26 @@ export class UsersService implements OnModuleInit {
   async onModuleInit() {
     const count = await this.usersModel.countDocuments();
 
-    const usersList: Partial<User>[] = [];
-    for (let i = 0; i < 30000; i++) {
-      const fakeUser = {
-        firstName: faker.person.firstName(),
-        lastName: faker.person.lastName(),
-        email: faker.internet.email(),
-        age: faker.number.int({ min: 18, max: 80 }),
-      };
-      usersList.push(fakeUser);
+    if (count === 0) {
+      const usersList: Partial<User>[] = [];
+      for (let i = 0; i < 30000; i++) {
+        const fakeUser = {
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
+          email: faker.internet.email(),
+          age: faker.number.int({ min: 18, max: 80 }),
+        };
+        usersList.push(fakeUser);
+      }
+      await this.usersModel.insertMany(usersList);
     }
-    await this.usersModel.insertMany(usersList);
-    console.log('created');
   }
 
   async create(CreateUserDto: CreateUserDto) {
     const existUser = await this.usersModel.findOne({
       email: CreateUserDto.email,
     });
-    console.log(existUser, 'existUser');
+
     if (existUser) throw new BadRequestException('User already exists');
     const user = await this.usersModel.create(CreateUserDto);
     return user;
@@ -63,6 +64,23 @@ export class UsersService implements OnModuleInit {
     return user;
   }
 
+  async update(
+    role: string,
+    tokenId: string,
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ) {
+    if (tokenId !== id && role !== 'admin')
+      throw new UnauthorizedException('permition dineid');
+    if (!isValidObjectId(id)) throw new BadRequestException('Invaid Id');
+    const updatedUser = await this.usersModel.findByIdAndUpdate(
+      id,
+      updateUserDto,
+      { new: true },
+    );
+    if (!updatedUser) throw new BadRequestException('not found');
+    return updatedUser;
+  }
   async remove(id: string) {
     if (!isValidObjectId(id)) throw new BadRequestException('Invalid id');
     const deletedUser = await this.usersModel.findByIdAndDelete(id);
